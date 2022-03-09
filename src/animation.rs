@@ -3,34 +3,34 @@
 // arrows: x, y, x + rcoswt, y + rsinwt
 // trajectory: next dot
 
-#[derive(Debug, Copy, Clone)]
-struct Circle {
-    x: f64,
-    y: f64,
-    r: f64,
-}
-
-#[derive(Debug, Copy, Clone)]
-struct Arrow {
-    x: f64,
-    y: f64,
-    x_end: f64,
-    y_end: f64,
-}
-
-#[derive(Debug, Copy, Clone)]
-struct Point {
-    x: f64,
-    y: f64,
-}
-
 #[derive(Debug)]
-struct Frame {
-    circles: Vec<Circle>,
-    arrows: Vec<Arrow>,
-    next_point: Point,
+pub struct Frame {
+    pub circles: Vec<Circle>,
+    pub arrows: Vec<Arrow>,
+    pub next_point: Point,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Circle {
+    pub x: f64,
+    pub y: f64,
+    pub r: f64,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Arrow {
+    pub x: f64,
+    pub y: f64,
+    pub x_end: f64,
+    pub y_end: f64,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Point {
+    pub x: f64,
+    pub y: f64,
 }
 
 trait Animation {
-    fn next() -> Frame;
+    fn next() -> Frame; // invoked by JavaScript
 }
