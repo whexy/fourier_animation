@@ -3,21 +3,25 @@
 // arrows: x, y, x + rcoswt, y + rsinwt
 // trajectory: next dot
 
-#[derive(Debug)]
+pub mod naive_animation;
+
+use serde::Serialize;
+
+#[derive(Debug, Clone, Serialize)]
 pub struct Frame {
     pub circles: Vec<Circle>,
     pub arrows: Vec<Arrow>,
     pub next_point: Point,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct Circle {
     pub x: f64,
     pub y: f64,
     pub r: f64,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct Arrow {
     pub x: f64,
     pub y: f64,
@@ -25,12 +29,12 @@ pub struct Arrow {
     pub y_end: f64,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
 }
 
-trait Animation {
-    fn next() -> Frame; // invoked by JavaScript
+pub trait Animation {
+    fn next(&mut self) -> Frame; // invoked by JavaScript, must be stateful (&mut self).
 }
