@@ -53,9 +53,8 @@ impl NaiveAnimation {
 
 impl Animation for NaiveAnimation {
     fn next(&mut self) -> Frame {
-        let frame = self.frame.clone();
         self._generate_next_frame();
-        frame.unwrap()
+        self.frame.as_ref().unwrap().clone()
     }
 }
 
