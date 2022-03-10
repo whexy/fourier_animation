@@ -10,37 +10,43 @@ use fourier::Input;
 use std::{collections::HashMap, sync::Mutex};
 use wasm_bindgen::prelude::*;
 
-struct JSAnimation<T>
-where
-    T: Animation,
-{
-    input: Input,
-    animation: T,
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
 }
+
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
 
 type Naive = naive_animation::NaiveAnimation;
 // TODO: type Fourier = fourier::FourierAnimation;
 
 lazy_static! {
-    // Use NaiveAnimation as the default animation.
-    static ref ANIMATIONMAP: Mutex<HashMap<usize, JSAnimation<Naive>>> = Mutex::new(HashMap::new());
+    // TODO: Use Fourier as the default animation.
+    static ref ANIMATIONMAP: Mutex<HashMap<usize, Naive>> = Mutex::new(HashMap::new());
 }
 
 #[wasm_bindgen]
-pub fn init(animationId: usize, input: Vec<u32>) {
+pub fn create(animationId: usize, input: Vec<u32>) {
+    console_log!("Initializing animation {}", animationId);
+    let input = Input::from(input);
+    console_log!("Input: {:?}", input);
     ANIMATIONMAP.lock().unwrap().insert(
         animationId,
-        JSAnimation {
-            input: Input::from(input),
-            animation: Naive::new(),
-        },
+        Naive::new(Input::from(input)),
     );
+    console_log!("Created successfully!");
 }
 
 #[wasm_bindgen]
 pub fn next(animationId: usize) -> JsValue {
     let mut map = ANIMATIONMAP.lock().unwrap();
-    let mut jsAnimation = map.get_mut(&animationId).unwrap();
-    let frame = jsAnimation.animation.next();
+    let mut animation = map.get_mut(&animationId).unwrap();
+    console_log!("Get animation {}", animationId);
+    let frame = animation.next();
+    console_log!("{:?}", frame);
     JsValue::from_serde(&frame).unwrap()
 }

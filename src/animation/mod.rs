@@ -6,6 +6,7 @@
 pub mod naive_animation;
 
 use serde::Serialize;
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Frame {
