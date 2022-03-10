@@ -8,36 +8,45 @@ import type { Frame, Point } from "../../types/frame";
 
 const Home: FunctionalComponent = () => {
   let canvasRef = useRef(null);
+
+  const [pause, setPause] = useState(true);
+  const [t, setT] = useState<Point[]>([]);
+
   useEffect(() => {
-    create(0, Uint32Array.from([0, 0]));
+    create(0, Float64Array.from([100, 0, 70, 0, 5, 0])); // cabbage-like
+    // create(0, Float64Array.from([100, 0, 30, 0, 10, 0])); // chrysanthemum-like
   }, []);
 
-  const [frame, setFrame] = useState<Frame | null>(null);
-  let [trajectory, setTrajectory] = useState<Point[]>([]);
-
-  const pushPoint = (point: Point) => {
-    setTrajectory([...trajectory, point]);
-  };
-
-  const goNext = () => {
-    let frame = next(0) as Frame;
-    pushPoint(frame.next_point);
-    setFrame(frame);
-  };
-
   useEffect(() => {
-    let canvas = canvasRef.current as unknown as HTMLCanvasElement;
-    _goNext(canvas, frame!, trajectory);
-  }, [frame]);
+    if (!pause) {
+      let canvas = canvasRef.current as unknown as HTMLCanvasElement;
+      let trajectory: Point[] = t;
+      let loop = setInterval(() => {
+        let frame = next(0) as Frame;
+        trajectory.push(frame.next_point);
+        _goNext(canvas, frame!, trajectory);
+      }, 1000 / 120);
+      return () => {
+        clearInterval(loop);
+        setT(trajectory);
+      };
+    }
+  }, [pause]);
 
   return (
     <div class={style.home}>
       <h1>Fourier Animation Example</h1>
       <div>
-        <button onClick={goNext}>Next Frame</button>
+        <p>{pause ? "Pause" : "Play"}</p>
+        <button
+          onClick={() => {
+            setPause(!pause);
+          }}
+        >
+          Go
+        </button>
       </div>
       <canvas width={800} height={800} ref={canvasRef}></canvas>
-      <pre>{JSON.stringify(frame, undefined, 2)}</pre>
     </div>
   );
 };
@@ -51,7 +60,7 @@ const _goNext = (
   ctx.clearRect(0, 0, canvasRef.width, canvasRef.height);
 
   ctx.beginPath();
-  ctx.moveTo(0, 0);
+  ctx.moveTo(trajectory[0].x, trajectory[0].y);
   for (let i = 0; i < trajectory.length; i++) {
     const point = trajectory[i];
     ctx.lineTo(point.x, point.y);

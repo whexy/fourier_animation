@@ -1,13 +1,13 @@
 use super::*;
 use crate::fourier::Input;
-use num::Float;
 
 struct Vector(f64, f64);
 
 impl Vector {
     fn next(&mut self, level: f64) {
-        let x = (0.1 * level).cos() * self.0 - (0.1 * level).sin() * self.1;
-        let y = (0.1 * level).sin() * self.0 + (0.1 * level).cos() * self.1;
+        let r = self.r();
+        let x = (1.0 / r * level).cos() * self.0 - (1.0 / r * level).sin() * self.1;
+        let y = (1.0 / r * level).sin() * self.0 + (1.0 / r * level).cos() * self.1;
         self.0 = x;
         self.1 = y;
     }
@@ -33,14 +33,8 @@ pub struct NaiveAnimation {
 
 impl NaiveAnimation {
     pub fn new(input: Input) -> Self {
-        Self {
-            input,
-            arc: vec![
-                Vector(100.0, 100.0),
-                Vector(30.0, 40.0),
-                Vector(20.0, -30.0),
-            ],
-        }
+        let arc = input.path.iter().map(|p| Vector(p.x, p.y)).collect();
+        Self { input, arc }
     }
 
     fn _generate_next_frame(&mut self) -> Frame {

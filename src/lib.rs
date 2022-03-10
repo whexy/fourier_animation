@@ -30,23 +30,19 @@ lazy_static! {
 }
 
 #[wasm_bindgen]
-pub fn create(animationId: usize, input: Vec<u32>) {
-    console_log!("Initializing animation {}", animationId);
+pub fn create(animationId: usize, input: Vec<f64>) {
     let input = Input::from(input);
-    console_log!("Input: {:?}", input);
+    console_log!("{:?}", input);
     ANIMATIONMAP.lock().unwrap().insert(
         animationId,
         Naive::new(Input::from(input)),
     );
-    console_log!("Created successfully!");
 }
 
 #[wasm_bindgen]
 pub fn next(animationId: usize) -> JsValue {
     let mut map = ANIMATIONMAP.lock().unwrap();
     let mut animation = map.get_mut(&animationId).unwrap();
-    console_log!("Get animation {}", animationId);
     let frame = animation.next();
-    console_log!("{:?}", frame);
     JsValue::from_serde(&frame).unwrap()
 }
